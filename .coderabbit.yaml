@@ -1,260 +1,64 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
-#
-# Central CodeRabbit configuration for the tutti-os organization.
-# CodeRabbit automatically uses this file when it lives at:
-#   tutti-os/coderabbit/.coderabbit.yaml
-#
-# Goals:
-# - Keep normal reviews quiet: inline comments should be P0/P1 only.
-# - Still review Tutti workspace apps against their runtime/package contracts.
-# - Reuse repository AGENTS.md/CLAUDE.md guidance and the tutti-agent-skills repo.
 
 inheritance: true
-language: "zh-CN"
-early_access: false
-enable_free_tier: true
+language: "en-US"
 focus: "high"
 tone_instructions: >
-  Be concise and direct. Use Chinese for summaries and comments unless the
-  surrounding PR discussion is clearly in English. Prefer actionable findings
-  over explanation. Do not add playful content.
+  Use English by default because this is a public open-source organization.
+  If the PR author or discussion is primarily Chinese, use Chinese. Keep
+  comments concise, direct, and actionable.
 
 reviews:
   profile: "chill"
-  request_changes_workflow: false
-  commit_status: true
-  fail_commit_status: false
-
-  high_level_summary: true
-  high_level_summary_in_walkthrough: true
-  high_level_summary_instructions: >
-    Summarize only the user-visible behavior change, risky contract changes,
-    and verification gaps. Avoid restating every changed file.
-  review_status: true
-  review_details: true
-  collapse_walkthrough: true
-  changed_files_summary: true
-  sequence_diagrams: false
-  estimate_code_review_effort: false
-  assess_linked_issues: true
-  related_issues: false
-  related_prs: false
-  suggested_labels: false
-  suggested_reviewers: false
-  auto_assign_reviewers: false
-  in_progress_fortune: false
   poem: false
   enable_prompt_for_ai_agents: false
-
-  auto_review:
-    enabled: true
-    auto_incremental_review: true
-    auto_pause_after_reviewed_commits: 5
-    drafts: false
-    base_branches:
-      - "main"
-      - "master"
-    ignore_title_keywords:
-      - "wip"
-      - "draft"
-
-  path_filters:
-    - "!**/node_modules/**"
-    - "!**/.next/**"
-    - "!**/dist/**"
-    - "!**/build/**"
-    - "!**/coverage/**"
-    - "!**/.cache/**"
-    - "!**/.turbo/**"
-    - "!**/*.lock"
-    - "!**/*.min.js"
-    - "!**/*.map"
-    - "!**/*.zip"
-    - "!**/*.tar"
-    - "!**/*.tgz"
-    - "!**/*.gz"
-    - "!**/*.png"
-    - "!**/*.jpg"
-    - "!**/*.jpeg"
-    - "!**/*.gif"
-    - "!**/*.webp"
-    - "!**/*.mp4"
-    - "!**/*.mov"
-    - "!**/*.webm"
 
   path_instructions:
     - path: "**/*"
       instructions: |
-        Review with a high signal threshold.
+        Keep review noise low. Post inline comments only for P0/P1 issues:
+        security vulnerabilities, privacy leaks, data loss/corruption, crashes,
+        broken core functionality, clear regressions, or contract violations
+        likely to break users, CI, release, or other apps.
 
-        Post inline comments only for P0/P1 issues:
-        - security vulnerabilities, privacy leaks, data loss, or data corruption
-        - crashes, startup failures, broken core functionality, or clear regressions
-        - API/runtime/CLI contract violations likely to break users or other apps
-        - migration, auth, storage, release, or CI issues that can block deploy/merge
-
-        Do not post inline comments for P2/P3 issues:
-        - minor edge cases, low-risk races, style nits, optional refactors
-        - nice-to-have tests, small readability improvements, formatting preferences
-        - suggestions that are useful but not important enough to block or strongly delay merge
-
-        If a lower-priority observation is still worth preserving, put it in the
-        summary as non-blocking context, or omit it. Do not create noisy inline
-        comments for it.
-
-    - path: "**/AGENTS.md"
-      instructions: |
-        Treat AGENTS.md as repository or package-local guidance. Check it for
-        review criteria, but do not comment on the file unless the PR changes it
-        in a way that creates a real P0/P1 risk.
+        Do not post inline comments for P2/P3 issues, minor edge cases, style
+        nits, optional refactors, nice-to-have tests, or low-risk races. Put
+        lower-priority observations in the summary or omit them.
 
     - path: "**/tutti.app.json"
       instructions: |
-        This PR touches a Tutti workspace app manifest. Use the linked
-        tutti-os/tutti-agent-skills repository as the authoritative review
-        standard for Tutti app package behavior.
-
-        Focus inline comments on P0/P1 app contract problems:
-        - invalid manifest shape, missing healthcheck, bad runtime bootstrap path
-        - startup failure under the documented TUTTI_APP_* runtime environment
-        - writing durable data outside TUTTI_APP_DATA_DIR
-        - treating TUTTI_APP_PACKAGE_DIR as mutable after startup
-        - unsafe broad desktop, filesystem, network, token, or workspace access
-        - package/release artifacts that cannot be installed or started
-
-        Do not require optional capabilities such as MCP servers, local agents,
-        or CLI commands unless the manifest, PR description, product requirement,
-        or existing app architecture explicitly promises them.
+        This is a Tutti workspace app surface. Use tutti-os/tutti-agent-skills
+        as the review standard. Flag only P0/P1 manifest, runtime, package,
+        storage, healthcheck, security, or install/startup contract issues.
+        Do not require optional MCP/local-agent/CLI capabilities unless the PR
+        explicitly promises them.
 
     - path: "**/tutti.cli.json"
       instructions: |
-        Review this as a Tutti app-to-app CLI capability contract. Inline comments
-        should focus on P0/P1 problems:
-        - command output does not follow the documented stable JSON/envelope shape
-        - timeout budgets are inconsistent with implementation waits
-        - commands expose arbitrary local file reads or unsafe network access
-        - docs, schema, and handler behavior disagree in a way callers will hit
-        - status/readiness commands report success when required runtime providers are unavailable
-
-        Missing nice-to-have commands or extra tests are not inline-comment issues.
+        Review as a Tutti app-to-app CLI contract. Flag only P0/P1 issues:
+        unstable output/envelope shape, unsafe file/network access, bad timeout
+        budgets, misleading readiness/status, or docs/schema/handler mismatch
+        that callers are likely to hit.
 
     - path: "**/bootstrap.sh"
       instructions: |
-        For Tutti apps, bootstrap must be launch-only and must use managed runtime
-        variables such as TUTTI_APP_HOST, TUTTI_APP_PORT, TUTTI_APP_PACKAGE_DIR,
-        TUTTI_APP_DATA_DIR, TUTTI_APP_RUNTIME_DIR, TUTTI_APP_LOG_DIR,
-        TUTTI_APP_PYTHON, TUTTI_APP_NODE, and TUTTI_APP_NPM.
-
-        Flag P0/P1 issues when bootstrap hard-requires non-contract workspace
-        metadata, installs dependencies at startup, binds the wrong host/port, or
-        cannot start the packaged app under the documented runtime environment.
-
-    - path: "**/scripts/package*"
-      instructions: |
-        For Tutti app package builders, focus on installability and runtime
-        correctness: required files, executable bootstrap, generated manifests,
-        package-local AGENTS.md, localization files, build output, asset size, and
-        release artifacts. Inline comments only for contract-breaking issues.
-
-    - path: "**/.github/workflows/**"
-      instructions: |
-        Inline comments should focus on CI/release failures, unsafe permissions,
-        secret exposure, wrong publish targets, or workflows that can produce
-        uninstallable artifacts. Avoid generic workflow style suggestions.
-
-  finishing_touches:
-    docstrings:
-      enabled: false
-    unit_tests:
-      enabled: false
-    simplify:
-      enabled: false
+        For Tutti apps, bootstrap must use documented TUTTI_APP_* runtime
+        variables, bind the configured host/port, avoid startup installs, and
+        start from the packaged app. Flag only issues that can break runtime
+        startup or violate package/storage ownership.
 
   pre_merge_checks:
     docstrings:
       mode: "off"
-    title:
-      mode: "warning"
-      requirements: >
-        Title should be concise, describe the user-visible or contract-level
-        change, and avoid vague wording such as "updates" when a clearer scope exists.
-    description:
-      mode: "warning"
-    issue_assessment:
-      mode: "warning"
-    custom_checks: []
-
-chat:
-  art: false
-  auto_reply: true
-  allow_non_org_members: false
-  integrations:
-    jira:
-      usage: "auto"
-    linear:
-      usage: "auto"
 
 knowledge_base:
-  opt_out: false
-
-  web_search:
-    enabled: true
-
   code_guidelines:
     enabled: true
-    filePatterns:
-      - "CONTRIBUTING.md"
-      - "docs/**/REVIEW.md"
-      - "docs/**/CODING_STANDARDS.md"
-
-  learnings:
-    scope: "global"
-    approval_delay: 0
-
-  issues:
-    scope: "auto"
-
-  jira:
-    usage: "auto"
-    project_keys: []
-
-  linear:
-    usage: "auto"
-    team_keys: []
-
-  pull_requests:
-    scope: "auto"
-
-  mcp:
-    usage: "auto"
-    disabled_servers: []
-
-  automatic_repository_linking: false
 
   linked_repositories:
     - repository: "tutti-os/tutti-agent-skills"
       instructions: >
         Authoritative Tutti workspace app review standards. Apply this context
-        only when a PR contains Tutti app surfaces such as tutti.app.json,
-        tutti.cli.json, bootstrap.sh, app package builders, app-local AGENTS.md,
-        TUTTI_APP_* runtime handling, local agent/runtime integration, or Tutti
-        app release workflows.
-
-code_generation:
-  docstrings:
-    language: "zh-CN"
-    path_instructions: []
-  unit_tests:
-    path_instructions: []
-
-issue_enrichment:
-  auto_enrich:
-    enabled: false
-  planning:
-    enabled: true
-  auto_planning:
-    enabled: false
-    labels: []
-  labeling:
-    labeling_instructions: []
-    auto_apply_labels: false
+        only when a PR touches Tutti app surfaces such as tutti.app.json,
+        tutti.cli.json, bootstrap.sh, packaging, TUTTI_APP_* runtime handling,
+        app-local AGENTS.md, local agent/runtime integration, or release workflows.

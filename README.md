@@ -13,6 +13,8 @@ shared defaults for all `tutti-os` repositories.
   when PRs touch `tutti.app.json`, `tutti.cli.json`, `bootstrap.sh`, packaging,
   runtime environment handling, or release workflows.
 - Lower-priority observations should go in summaries or be omitted.
+- English is the default for this public open-source organization. Chinese is
+  still allowed when the PR discussion is primarily Chinese.
 
 ## Notes
 
